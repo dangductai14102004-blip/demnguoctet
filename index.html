@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>Đếm ngược Tết 2026</title>
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      display:flex;flex-direction:column;justify-content:center;align-items:center;
+      height:100vh;width:100vw;
+      font-family:'Segoe UI',Roboto,Arial;
+      color:#fff;text-align:center;
+      background:linear-gradient(180deg,#b02020 0%,#e65050 100%);
+      overflow:hidden;
+    }
+    h1{
+      font-size:clamp(22px,5vw,34px);
+      font-weight:700;
+      text-shadow:0 2px 4px rgba(0,0,0,0.3);
+      margin-bottom:20px;
+    }
+    .time{
+      font-size:clamp(36px,10vw,60px);
+      font-weight:800;
+      color:#fff;
+      text-shadow:0 0 15px rgba(255,255,255,0.5);
+    }
+    .label{
+      font-size:clamp(24px,4vw,26px);
+      color:#ffef9f;
+      margin-top:14px;
+      text-shadow:0 1px 2px rgba(0,0,0,0.3);
+    }
+    .decor{
+      position:absolute;top:0;left:0;width:100%;height:100%;
+      background-image:
+        radial-gradient(circle at 20% 20%,rgba(255,255,255,0.08) 0,transparent 40%),
+        radial-gradient(circle at 80% 30%,rgba(255,255,255,0.06) 0,transparent 40%),
+        url('nen.png');
+      background-size:cover;
+      background-position:center;
+      opacity:0.7;
+      z-index:-1;
+    }
+    .footer{
+      position:absolute;bottom:10px;
+      font-size:clamp(14px,4vw,18px);
+      color:#fffbda;
+      opacity:0.85;
+    }
+    #soundBtn{
+      margin-top:15px;
+      padding:10px 20px;
+      font-size:17px;
+      border:none;
+      border-radius:12px;
+      background:#ffd633;
+      color:#700;
+      font-weight:600;
+      box-shadow:0 2px 5px rgba(0,0,0,0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="decor"></div>
+  <h1>Đếm ngược Tết Nguyên Đán 2026</h1>
+
+  <div id="count" class="time">-- ngày --:--:--:--</div>
+  <div class="label">Mùng 1 Tết: 17/02/2026 🎉</div>
+
+  <button id="soundBtn">🔈 Bật âm thanh</button>
+
+  <div class="footer">Chúc bạn một mùa Tết ấm áp, an lành 🌸</div>
+
+  <audio id="tick" preload="auto">
+  <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_3e9c6dc2b8.mp3?filename=clock-ticking-87406.mp3" type="audio/mpeg">
+</audio>
+
+
+  <script>
+    const target = new Date('2026-02-17T00:00:00+07:00');
+    const el = document.getElementById('count');
+    const tick = document.getElementById('tick');
+    document.body.addEventListener('touchstart', ()=>tick.play(), {once:true});
+    document.body.addEventListener('click', ()=>tick.play(), {once:true});
+
+    let soundEnabled = false;
+
+    function update() {
+      const now = new Date();
+      let diff = Math.floor((target - now) / 1000);
+      if (diff <= 0) {
+        el.textContent = '🎆 Chúc mừng năm mới 🎇';
+        clearInterval(timer);
+        return;
+      }
+      const d = Math.floor(diff / 86400); diff %= 86400;
+      const h = Math.floor(diff / 3600); diff %= 3600;
+      const m = Math.floor(diff / 60);
+      const s = diff % 60;
+      el.textContent = `${d} ngày ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      if (soundEnabled) {
+        tick.currentTime = 0;
+        tick.play().catch(()=>{});
+      }
+    }
+
+    // Cập nhật mỗi giây
+    update();
+    const timer = setInterval(update, 1000);
+
+    // Kích hoạt Service Worker cho PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js');
+      });
+    }
+
+    // Nút bật âm thanh
+    document.getElementById('soundBtn').addEventListener('click',()=>{
+      soundEnabled = !soundEnabled;
+      tick.load(); // nạp lại file âm thanh
+      if (soundEnabled) {
+        tick.play();
+        alert("Âm thanh đã bật 🎶");
+        document.getElementById('soundBtn').textContent = "🔇 Tắt âm thanh";
+      } else {
+        document.getElementById('soundBtn').textContent = "🔈 Bật âm thanh";
+      }
+    });
+  </script>
+</body>
+</html>
